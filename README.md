@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <div align="center" style="margin: 30px;">
 <a href="https://refine.dev/">
   <img alt="refine logo" src="https://refine.ams3.cdn.digitaloceanspaces.com/readme/refine-readme-banner.png">
@@ -41,3 +42,7 @@ npm create refine-app@latest -- --example auth-material-ui
 <br/>
 
 [![Open auth-material-ui example from refine](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/embed/github/refinedev/refine/tree/main/examples/auth-material-ui?view=preview&theme=dark&codemirror=1)
+<br/>
+# ai_financial_safer
+stock fixedincome foreigncurrencies market and portfolio.AI investor with you. include：market ，portfolio and ai investor
+
