@@ -1,338 +1,178 @@
+import {  Refine } from "@refinedev/core";
+import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
+import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
+
 import {
-  GitHubBanner,
-  Refine,
-  type AuthProvider,
-  Authenticated,
-} from "@refinedev/core";
-import {
-  ThemedLayoutV2,
   ErrorComponent,
-  RefineThemes,
-  useNotificationProvider,
   RefineSnackbarProvider,
-  AuthPage,
+  ThemedLayoutV2,
+  useNotificationProvider,
 } from "@refinedev/mui";
+
 import CssBaseline from "@mui/material/CssBaseline";
 import GlobalStyles from "@mui/material/GlobalStyles";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import { ThemeProvider } from "@mui/material/styles";
-import dataProvider from "@refinedev/simple-rest";
-import routerProvider, {
-  NavigateToResource,
-  CatchAllNavigate,
-  UnsavedChangesNotifier,
+import routerBindings, {
   DocumentTitleHandler,
+  NavigateToResource,
+  UnsavedChangesNotifier,
 } from "@refinedev/react-router";
-import { BrowserRouter, Routes, Route, Outlet } from "react-router";
-import { useFormContext } from "react-hook-form";
-import GitHubIcon from "@mui/icons-material/GitHub";
-import GoogleIcon from "@mui/icons-material/Google";
+import dataProvider from "@refinedev/simple-rest";
+import { BrowserRouter, Outlet, Route, Routes } from "react-router";
+import { Header } from "./components/header";
+import { ColorModeContextProvider } from "./contexts/color-mode";
+import {
+  BlogPostCreate,
+  BlogPostEdit,
+  BlogPostList,
+  BlogPostShow,
+} from "./pages/blog-posts";
+import {
+  CategoryCreate,
+  CategoryEdit,
+  CategoryList,
+  CategoryShow,
+} from "./pages/categories";
 
-import { PostList, PostCreate, PostEdit } from "../src/pages/posts";
+// 新增导入
+import { DashboardPage } from './pages/home/Dashboard';
+import { MarketQuotesPage } from './pages/market/MarketQuotes'; // 新增市场行情页面导入
+import { Dashboard, TrendingUp,CurrencyYen,CurrencyExchange,AttachMoney } from "@mui/icons-material"; // 新增趋势图标导入
+import { PortfolioList } from "./pages/portfolio/PortfolioList";
+import AccountBalanceWallet from "@mui/icons-material/AccountBalanceWallet"; // 持仓相关图标
+import { ChatBubble } from "@mui/icons-material"; // 新增聊天图标导入
+import ChatWindow from "./components/ChatWindow"; // 新增聊天组件导入
 
-/**
- *  mock auth credentials to simulate authentication
- */
-const authCredentials = {
-  email: "demo@refine.dev",
-  password: "demodemo",
-};
-
-const App: React.FC = () => {
-  const authProvider: AuthProvider = {
-    login: async ({ providerName, email }) => {
-      if (providerName === "google") {
-        window.location.href = "https://accounts.google.com/o/oauth2/v2/auth";
-        return {
-          success: true,
-        };
-      }
-
-      if (providerName === "github") {
-        window.location.href = "https://github.com/login/oauth/authorize";
-        return {
-          success: true,
-        };
-      }
-
-      if (email === authCredentials.email) {
-        localStorage.setItem("email", email);
-        return {
-          success: true,
-          redirectTo: "/",
-        };
-      }
-
-      return {
-        success: false,
-        error: {
-          message: "Login failed",
-          name: "Invalid email or password",
-        },
-      };
-    },
-    register: async (params) => {
-      if (params.email === authCredentials.email && params.password) {
-        localStorage.setItem("email", params.email);
-        return {
-          success: true,
-          redirectTo: "/",
-        };
-      }
-      return {
-        success: false,
-        error: {
-          message: "Register failed",
-          name: "Invalid email or password",
-        },
-      };
-    },
-    updatePassword: async (params) => {
-      if (params.password === authCredentials.password) {
-        //we can update password here
-        return {
-          success: true,
-        };
-      }
-      return {
-        success: false,
-        error: {
-          message: "Update password failed",
-          name: "Invalid password",
-        },
-      };
-    },
-    forgotPassword: async (params) => {
-      if (params.email === authCredentials.email) {
-        //we can send email with reset password link here
-        return {
-          success: true,
-        };
-      }
-      return {
-        success: false,
-        error: {
-          message: "Forgot password failed",
-          name: "Invalid email",
-        },
-      };
-    },
-    logout: async () => {
-      localStorage.removeItem("email");
-      return {
-        success: true,
-        redirectTo: "/login",
-      };
-    },
-    onError: async (error) => {
-      if (error.response?.status === 401) {
-        return {
-          logout: true,
-        };
-      }
-
-      return { error };
-    },
-    check: async () =>
-      localStorage.getItem("email")
-        ? {
-            authenticated: true,
-          }
-        : {
-            authenticated: false,
-            error: {
-              message: "Check failed",
-              name: "Not authenticated",
-            },
-            logout: true,
-            redirectTo: "/login",
-          },
-    getPermissions: async () => ["admin"],
-    getIdentity: async () => ({
-      id: 1,
-      name: "Jane Doe",
-      avatar:
-        "https://unsplash.com/photos/IWLOvomUmWU/download?force=true&w=640",
-    }),
-  };
-
-  const RememeberMe = () => {
-    const { register } = useFormContext();
-
-    return (
-      <FormControlLabel
-        sx={{
-          span: {
-            fontSize: "12px",
-            color: "text.secondary",
-          },
-        }}
-        color="secondary"
-        control={
-          <Checkbox size="small" id="rememberMe" {...register("rememberMe")} />
-        }
-        label="Remember me"
-      />
-    );
-  };
-
+function App() {
   return (
     <BrowserRouter>
-      <GitHubBanner />
-      <ThemeProvider theme={RefineThemes.Blue}>
-        <CssBaseline />
-        <GlobalStyles styles={{ html: { WebkitFontSmoothing: "auto" } }} />
-        <RefineSnackbarProvider>
-          <Refine
-            authProvider={authProvider}
-            dataProvider={dataProvider("https://api.fake-rest.refine.dev")}
-            routerProvider={routerProvider}
-            notificationProvider={useNotificationProvider}
-            resources={[
-              {
-                name: "posts",
-                list: "/posts",
-                edit: "/posts/edit/:id",
-                create: "/posts/create",
-              },
-            ]}
-            options={{
-              syncWithLocation: true,
-              warnWhenUnsavedChanges: true,
-            }}
-          >
-            <Routes>
-              <Route
-                element={
-                  <Authenticated
-                    key="authenticated-routes"
-                    fallback={<CatchAllNavigate to="/login" />}
+      <RefineKbarProvider>
+        <ColorModeContextProvider>
+          <CssBaseline />
+          <GlobalStyles styles={{ html: { WebkitFontSmoothing: "auto" } }} />
+          <RefineSnackbarProvider>
+            <DevtoolsProvider>
+              <Refine
+                dataProvider={dataProvider("https://api.fake-rest.refine.dev")}
+                notificationProvider={useNotificationProvider}
+                routerProvider={routerBindings}
+                resources={[
+                  {
+                    name: 'dashboard',
+                    list: DashboardPage,
+                    meta: {
+                      label: '仪表盘',
+                      icon: <Dashboard />,
+                      order: 1,
+                    },
+                  },
+                  {
+                    name: 'market',
+                    list: MarketQuotesPage,
+                    meta: {
+                      label: '市场行情',
+                      icon: <TrendingUp />,
+                      order: 2,
+                    },
+                  },
+                  // 新增组合持仓资源配置
+                  {
+                    name: "portfolios",  // 对应后端API路径（需与实际接口匹配）
+                    list: PortfolioList, // 绑定列表页面
+                    meta: {
+                      label: "组合持仓",  // 菜单显示名称
+                      icon: <AttachMoney />,  // 持仓相关图标 />,  // 持仓相关图标
+                      order: 3,  // 排在市场行情之后
+                    },
+                  },
+                  {
+                    name: "posts",
+                    list: "/blog-posts",
+                    create: "/blog-posts/create",
+                    edit: "/blog-posts/edit/:id",
+                    show: "/blog-posts/show/:id",
+                    meta: {
+                      canDelete: true,
+                    },
+                  },
+                  {
+                    name: "categories",
+                    list: "/categories",
+                    create: "/categories/create",
+                    edit: "/categories/edit/:id",
+                    show: "/categories/show/:id",
+                    meta: {
+                      canDelete: true,
+                    },
+                  },
+                  // 新增聊天窗口资源
+                  {
+                    name: "chat",
+                    list: ChatWindow, // 绑定聊天组件
+                    meta: {
+                      label: "智能问答", // 菜单显示名称
+                      icon: <ChatBubble />, // 聊天图标
+                      order: 4, // 排在组合持仓之后
+                    },
+                  },
+                ]}
+                options={{
+                  syncWithLocation: true,
+                  warnWhenUnsavedChanges: true,
+                  useNewQueryKeys: true,
+                  projectId: "CEZHDy-27gV0I-Zx9n6e",
+                }}
+              >
+                <Routes>
+                  <Route
+                    element={
+                      <ThemedLayoutV2 
+                        Title={() => (
+                          <span>
+                            <CurrencyYen /> 中国外汇投资中心<CurrencyExchange />
+                          </span>
+                        )}
+                        Header={() => <Header sticky />}
+                      >
+                        <Outlet />
+                      </ThemedLayoutV2>
+                    }
                   >
-                    <ThemedLayoutV2>
-                      <Outlet />
-                    </ThemedLayoutV2>
-                  </Authenticated>
-                }
-              >
-                <Route
-                  index
-                  element={<NavigateToResource resource="posts" />}
-                />
-
-                <Route path="/posts">
-                  <Route index element={<PostList />} />
-                  <Route path="create" element={<PostCreate />} />
-                  <Route path="edit/:id" element={<PostEdit />} />
-                </Route>
-              </Route>
-
-              <Route
-                element={
-                  <Authenticated key="auth-pages" fallback={<Outlet />}>
-                    <NavigateToResource resource="posts" />
-                  </Authenticated>
-                }
-              >
-                <Route
-                  path="/login"
-                  element={
-                    <AuthPage
-                      type="login"
-                      rememberMe={<RememeberMe />}
-                      formProps={{
-                        defaultValues: {
-                          ...authCredentials,
-                        },
-                      }}
-                      providers={[
-                        {
-                          name: "google",
-                          label: "Sign in with Google",
-                          icon: (
-                            <GoogleIcon
-                              style={{
-                                fontSize: 24,
-                              }}
-                            />
-                          ),
-                        },
-                        {
-                          name: "github",
-                          label: "Sign in with GitHub",
-                          icon: (
-                            <GitHubIcon
-                              style={{
-                                fontSize: 24,
-                              }}
-                            />
-                          ),
-                        },
-                      ]}
+                    <Route
+                      index
+                      element={<NavigateToResource resource="blog_posts" />}
                     />
-                  }
-                />
-                <Route
-                  path="/register"
-                  element={
-                    <AuthPage
-                      type="register"
-                      providers={[
-                        {
-                          name: "google",
-                          label: "Sign in with Google",
-                          icon: (
-                            <GoogleIcon
-                              style={{
-                                fontSize: 24,
-                              }}
-                            />
-                          ),
-                        },
-                        {
-                          name: "github",
-                          label: "Sign in with GitHub",
-                          icon: (
-                            <GitHubIcon
-                              style={{
-                                fontSize: 24,
-                              }}
-                            />
-                          ),
-                        },
-                      ]}
-                    />
-                  }
-                />
-                <Route
-                  path="/forgot-password"
-                  element={<AuthPage type="forgotPassword" />}
-                />
-                <Route
-                  path="/update-password"
-                  element={<AuthPage type="updatePassword" />}
-                />
-              </Route>
+                    <Route path="/blog-posts">
+                      <Route index element={<BlogPostList />} />
+                      <Route path="create" element={<BlogPostCreate />} />
+                      <Route path="edit/:id" element={<BlogPostEdit />} />
+                      <Route path="show/:id" element={<BlogPostShow />} />
+                    </Route>
+                    <Route path="/categories">
+                      <Route index element={<CategoryList />} />
+                      <Route path="create" element={<CategoryCreate />} />
+                      <Route path="edit/:id" element={<CategoryEdit />} />
+                      <Route path="show/:id" element={<CategoryShow />} />
+                    </Route>
+                    <Route path="/dashboard" element={<DashboardPage />} />
+                    <Route path="/market" element={<MarketQuotesPage />} />
+                    {/* 新增组合持仓路由 */}
+                    <Route path="/portfolios" element={<PortfolioList />} />
+                    <Route path="/chat" element={<ChatWindow />} />
+                    <Route path="*" element={<ErrorComponent />} />
+                  </Route>
+                </Routes>
 
-              <Route
-                element={
-                  <Authenticated key="catch-all">
-                    <ThemedLayoutV2>
-                      <Outlet />
-                    </ThemedLayoutV2>
-                  </Authenticated>
-                }
-              >
-                <Route path="*" element={<ErrorComponent />} />
-              </Route>
-            </Routes>
-            <UnsavedChangesNotifier />
-            <DocumentTitleHandler />
-          </Refine>
-        </RefineSnackbarProvider>
-      </ThemeProvider>
+                <RefineKbar />
+                <UnsavedChangesNotifier />
+                <DocumentTitleHandler />
+              </Refine>
+              <DevtoolsPanel />
+            </DevtoolsProvider>
+          </RefineSnackbarProvider>
+        </ColorModeContextProvider>
+      </RefineKbarProvider>
     </BrowserRouter>
   );
-};
+}
 
 export default App;
