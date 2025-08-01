@@ -128,10 +128,15 @@ function App() {
                   },
                   {
                     name: "para-ports",
-                    list: "/para-ports",
-                    create: "/para-ports/create",
-                    edit: "/para-ports/edit/:id",
-                    show: "/para-ports/show/:id",
+                    list: ParaPortList,
+                    create: ParaPortCreate,
+                    edit: ParaPortEdit,
+                    show: ParaPortShow,
+                    meta: {
+                      label: "参数组合",
+                      icon: <Settings />, // 可选：添加图标
+                      order: 5, // 可选：设置菜单顺序
+                    },
                   },
                 ]}
                 options={{
