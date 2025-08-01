@@ -121,14 +121,14 @@ export const MarketQuotesPage = () => {
             height={350}
             xAxis={[{
               dataKey: 'date',
-              valueFormatter: (value) => dateFormatter.format(new Date(value)),
+              valueFormatter: (value: number) => dateFormatter.format(new Date(value)),
               label: '日期',
               tickMinStep: oneDay
             }]}
             yAxis={[{
               label: '指数点数',
               tickMinStep: 100,
-              valueFormatter: (value) => value.toFixed(0)
+              valueFormatter: (value: number) => value.toFixed(0)
             }]}
             series={[{
               dataKey: 'value',

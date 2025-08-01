@@ -1,4 +1,4 @@
-import {  Refine } from "@refinedev/core";
+import { Refine } from "@refinedev/core";
 import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 
@@ -34,9 +34,22 @@ import {
 } from "./pages/categories";
 
 // 新增导入
-import { DashboardPage } from './pages/home/Dashboard';
-import { MarketQuotesPage } from './pages/market/MarketQuotes'; // 新增市场行情页面导入
-import { Dashboard, TrendingUp,CurrencyYen,CurrencyExchange,AttachMoney } from "@mui/icons-material"; // 新增趋势图标导入
+import { DashboardPage } from "./pages/home/Dashboard";
+import { MarketQuotesPage } from "./pages/market/MarketQuotes"; // 新增市场行情页面导入
+import {
+  Dashboard,
+  TrendingUp,
+  CurrencyYen,
+  CurrencyExchange,
+  AttachMoney,
+} from "@mui/icons-material"; // 新增趋势图标导入
+import {
+  ParaPortList,
+  ParaPortCreate,
+  ParaPortEdit,
+  ParaPortShow,
+} from "./pages/para-port";
+
 import { PortfolioList } from "./pages/portfolio/PortfolioList";
 import AccountBalanceWallet from "@mui/icons-material/AccountBalanceWallet"; // 持仓相关图标
 import { ChatBubble } from "@mui/icons-material"; // 新增聊天图标导入
@@ -52,36 +65,36 @@ function App() {
           <RefineSnackbarProvider>
             <DevtoolsProvider>
               <Refine
-                dataProvider={dataProvider("https://api.fake-rest.refine.dev")}
+                // 关键修改：将示例 API 地址替换为你的 FastAPI 后端地址
+                dataProvider={dataProvider("http://94.72.124.184:8001")}  // 指向本地 8000 端口的 FastAPI
                 notificationProvider={useNotificationProvider}
                 routerProvider={routerBindings}
                 resources={[
                   {
-                    name: 'dashboard',
+                    name: "dashboard",
                     list: DashboardPage,
                     meta: {
-                      label: '仪表盘',
+                      label: "仪表盘",
                       icon: <Dashboard />,
                       order: 1,
                     },
                   },
                   {
-                    name: 'market',
+                    name: "market",
                     list: MarketQuotesPage,
                     meta: {
-                      label: '市场行情',
+                      label: "市场行情",
                       icon: <TrendingUp />,
                       order: 2,
                     },
-                  },
-                  // 新增组合持仓资源配置
+                  }, // 新增组合持仓资源配置
                   {
-                    name: "portfolios",  // 对应后端API路径（需与实际接口匹配）
+                    name: "portfolios", // 对应后端API路径（需与实际接口匹配）
                     list: PortfolioList, // 绑定列表页面
                     meta: {
-                      label: "组合持仓",  // 菜单显示名称
-                      icon: <AttachMoney />,  // 持仓相关图标 />,  // 持仓相关图标
-                      order: 3,  // 排在市场行情之后
+                      label: "组合持仓", // 菜单显示名称
+                      icon: <AttachMoney />, // 持仓相关图标 />,  // 持仓相关图标
+                      order: 3, // 排在市场行情之后
                     },
                   },
                   {
@@ -103,8 +116,7 @@ function App() {
                     meta: {
                       canDelete: true,
                     },
-                  },
-                  // 新增聊天窗口资源
+                  }, // 新增聊天窗口资源
                   {
                     name: "chat",
                     list: ChatWindow, // 绑定聊天组件
@@ -113,6 +125,13 @@ function App() {
                       icon: <ChatBubble />, // 聊天图标
                       order: 4, // 排在组合持仓之后
                     },
+                  },
+                  {
+                    name: "para-ports",
+                    list: "/para-ports",
+                    create: "/para-ports/create",
+                    edit: "/para-ports/edit/:id",
+                    show: "/para-ports/show/:id",
                   },
                 ]}
                 options={{
@@ -125,10 +144,11 @@ function App() {
                 <Routes>
                   <Route
                     element={
-                      <ThemedLayoutV2 
+                      <ThemedLayoutV2
                         Title={() => (
                           <span>
-                            <CurrencyYen /> 中国外汇投资中心<CurrencyExchange />
+                            <CurrencyYen /> 中史外汇投资中心
+                            <CurrencyExchange />
                           </span>
                         )}
                         Header={() => <Header sticky />}
@@ -137,9 +157,10 @@ function App() {
                       </ThemedLayoutV2>
                     }
                   >
+                    {/* 修正：将 resource 改为已注册的 "posts"（与 resources 中的 name 一致） */}
                     <Route
                       index
-                      element={<NavigateToResource resource="blog_posts" />}
+                      element={<NavigateToResource resource="posts" />}
                     />
                     <Route path="/blog-posts">
                       <Route index element={<BlogPostList />} />
@@ -158,6 +179,16 @@ function App() {
                     {/* 新增组合持仓路由 */}
                     <Route path="/portfolios" element={<PortfolioList />} />
                     <Route path="/chat" element={<ChatWindow />} />
+                    {/* 新增 para-ports 路由（关键修改） */}
+                    <Route path="/para-ports">
+                      {/* 假设通过 refine add resource 生成了以下组件 */}
+                      <Route index element={<ParaPortList />} /> {/* 列表页 */}
+                      <Route path="create" element={<ParaPortCreate />} /> {/* 新建页 */}
+                      <Route path="edit/:id" element={<ParaPortEdit />} /> {/* 编辑页 */}
+                      <Route path="show/:id" element={<ParaPortShow />} /> {/* 详情页 */}
+                    </Route>
+
+                    {/* 原有其他路由保持不变 ... */}
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>
                 </Routes>

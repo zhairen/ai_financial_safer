@@ -3,7 +3,7 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [react()],
-   server:{
-  host:'94.72.124.184'
-  },
+  server:{
+ host:'0.0.0.0', // '.124.184'
+ },
 });

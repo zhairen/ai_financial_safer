@@ -7,8 +7,11 @@
 
 # 2025-7-31
 - fetch data -后端和数据库
-- fastapi 
+- fastapi
 - postgreq
+- npm install -g @refinedev/cli@latest 
+--npm install @refinedev/simple-rest@latest
+
 
 #* 2025-8-1
 - finrobot -ai功能
@@ -18,5 +21,6 @@
 #* 2025-8-2
 - login 登录功能
 - forex
-- buy forex instrument:etf,stock,fixedincome,gold,bitcoin,product ,forex currency.
-- 支付功能 
+- buy forex instrument:etf,stock,fixedincome,gold,bitcoin,product ,forex currenc
+y.
+- 支付功能

@@ -83,7 +83,7 @@ export const DashboardPage = () => {
         <Grid item xs={12} sm={6} md={3}>
           <Card sx={{ height: '100%', p: 2 }}>
             <CardContent>
-              <Typography variant="body2" color="text.secondary">资产类别数</Typography>
+              <Typography variant="body2" color="text.secondary">管理组合数</Typography>
               <Typography variant="h5" sx={{ fontWeight: 'bold', mt: 1 }}>12类</Typography>
             </CardContent>
           </Card>
@@ -107,7 +107,7 @@ export const DashboardPage = () => {
                   arcLabel: (item) => `${item.value}%`,
                   arcLabelMinAngle: 35,
                   arcLabelRadius: '60%',
-                  colors: ['#2c7be5', '#3ac47d', '#ff9029', '#d92550']
+                  color: '#2c7be5'
                 },
               ]}
               sx={{
@@ -124,7 +124,7 @@ export const DashboardPage = () => {
           <Grid item>
             <ul style={{ listStyle: 'none', padding: 0 }}>
               {assetData.map((item, index) => (
-                <li key={item.type} style={{ display: 'flex', alignItems: 'center', mb: 8 }}>
+                <li key={item.type} style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
                   {/* 颜色标识 */}
                   <div 
                     style={{ 
@@ -132,7 +132,7 @@ export const DashboardPage = () => {
                       height: 16, 
                       borderRadius: 4, 
                       backgroundColor: ['#2c7be5', '#3ac47d', '#ff9029', '#d92550'][index],
-                      mr: 8 
+                      marginRight: 8
                     }}
                   />
                   {/* 资产类型名称 */}
